@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>I'm in a React app!</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/react.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/react/0.14.0-rc1/react-dom.js"></script> -->
+    <!-- JSXTransformer は 0.14 から非推奨 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.13.3/JSXTransformer.js"></script>
+  </head>
+  <body>
+    <div id="myApp"></div>
+
+    <script type="text/jsx">
+
+      // アプリ全体
+      var TodoApp = React.createClass({
+        getInitialState: function(){
+          return {
+            todos: []
+          }
+        },
+
+        onAdd: function(newTodo){
+          this.setState({
+            todos : this.state.todos.concat({item:newTodo, status:0})
+          });
+        },
+
+        onDelete: function(i){
+          var targetTodo = this.state.todos[i];
+          targetTodo.status = 1;
+          this.setState({
+            todos: this.state.todos
+          });
+        },
+
+        render: function(){
+          return (
+            <div className="TodoApp">
+              <TodoCreator onAdd={this.onAdd}/>
+              <TodoList todos={this.state.todos} onDelete={this.onDelete}/>
+            </div>
+          );
+        }
+      });
+
+      // 新規Todoリスト追加
+      var TodoCreator = React.createClass({
+        getInitialState: function(){
+          return {
+            value: ""
+          }
+        },
+
+        _onAdd: function(){
+          var newTodo = this.refs.inputText.getDOMNode().value;
+          this.props.onAdd(newTodo);
+          this.setState({value: ""});
+        },
+
+        _onChange: function(e){
+          this.setState({
+            value: e.target.value
+          });
+        },
+
+        render: function(){
+          return (
+            <div className="TodoCreator">
+              <input type="text" value={this.state.value} ref="inputText" placeholder="Input your new todo" onChange={this._onChange}/>
+              <button onClick={this._onAdd}>Add</button>
+            </div>
+          );
+        }
+      });
+
+      var TodoList = React.createClass({
+        _onDelete: function(i){
+          this.props.onDelete(i);
+        },
+
+        render: function() {
+          return (
+            <ul>
+              {
+                this.props.todos.map(function(todo,i){
+                  if (todo.status == 0) {
+                    return (
+                      <li key={i}>
+                        <input type="checkbox"
+                               onClick={this._onDelete.bind(this,i )}/>{todo.item}
+                      </li>
+                    )
+                  } else {
+                    return <li key={i}><s>{todo.item}</s></li>
+                  }
+                },this)
+              }
+            </ul>
+          );
+        }
+      });
+
+      React.render(
+        <TodoApp/>,
+        document.getElementById('myApp')
+      );
+
+    </script>
+
+  </body>
+</html>
