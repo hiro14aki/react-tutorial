@@ -4,7 +4,7 @@ import '../css/style.scss';
 
 function Square(props) {
   return (
-    <button className="square" onClick={() => props.onClick()}>
+    <button className={`square ${props.target}`} onClick={() => props.onClick()}>
       {props.value}
     </button>
   );
@@ -12,8 +12,20 @@ function Square(props) {
 
 class Board extends React.Component {
   renderSquare(i) {
+    let res = "";
+    if(this.props.winner[1]){
+      let obj = this.props.winner[1]
+      for(let k of Object.keys(obj)){
+        if (obj[k] === i){
+          res = 'target'
+          break
+        }
+      }
+    }
+
     return <Square
              value={this.props.squares[i]}
+             target={res}
              onClick={() => this.props.onClick(i)}
             />;
   }
@@ -59,7 +71,7 @@ class Game extends React.Component {
     var history = this.state.history.slice(0, this.state.stepNumber + 1);
     var current = history[history.length - 1];
     const squares = current.squares.slice();
-    if (calculateWinner(squares) || squares[i]) {
+    if (calculateWinner(squares)[0] || squares[i]) {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
@@ -85,8 +97,8 @@ class Game extends React.Component {
     const winner = calculateWinner(current.squares);
 
     let status;
-    if (winner) {
-      status = 'Winner: ' + winner;
+    if (winner[0]) {
+      status = 'Winner: ' + winner[0];
     } else {
       status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
     }
@@ -108,6 +120,7 @@ class Game extends React.Component {
         <div className="game-board">
           <Board
             squares={current.squares}
+            winner={winner}
             onClick={(i) => this.handleClick(i)}
           />
         </div>
@@ -141,8 +154,8 @@ function calculateWinner(squares) {
   for (let i = 0; i < lines.length; i++) {
     const [a, b, c] = lines[i];
     if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-      return squares[a];
+      return [squares[a], lines[i]];
     }
   }
-  return null;
+  return [null];
 }
