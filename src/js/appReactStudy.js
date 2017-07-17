@@ -95,9 +95,10 @@ class Game extends React.Component {
       const desc = move ?
         'Move #' + move :
         'Game start';
+      const recent = move == this.state.stepNumber ? 'is-current' : '';
       return (
         <li key={move}>
-          <a href="#" onClick={() => this.jumpTo(move)}>{desc}</a>
+          <a href="#" className={recent} onClick={() => this.jumpTo(move)}>{desc}</a>
         </li>
       );
     });
@@ -112,7 +113,7 @@ class Game extends React.Component {
         </div>
         <div className="game-info">
           <div>{status}</div>
-          <ol>{moves}</ol>
+          <ol className="game-info__history">{moves}</ol>
         </div>
       </div>
     );
